@@ -20,7 +20,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-produc
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1','talkie.ovh','www.talkie.ovh']
 
 
 INSTALLED_APPS = [
@@ -134,7 +134,14 @@ LOGIN_REDIRECT_URL = 'feed'
 LOGOUT_REDIRECT_URL = 'login'
 LOGIN_URL = 'login'
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://talkie.ovh',
+    'http://www.talkie.ovh',
+    'https://talkie.ovh',
+    'https://www.talkie.ovh',
+]
 
 WEBRTC_ICE_SERVERS = json.loads(config(
     'WEBRTC_ICE_SERVERS',

@@ -132,14 +132,15 @@
                         </div>
                     </div>
 
-                    <button type="button" class="md:hidden text-gray-700 hover:text-pink-600" aria-controls="mobileMenu" aria-expanded="false" onclick="toggleMobileMenu()">
+                    <button id="mobileMenuButton" type="button" class="md:hidden inline-flex items-center gap-2 px-3 py-2 rounded-md text-gray-700 hover:text-pink-600 hover:bg-gray-100" aria-controls="mobileMenu" aria-expanded="false" onclick="toggleMobileMenu()">
                         <i class="fas fa-bars text-xl"></i>
+                        <span class="text-sm font-medium">Menu</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200">
+        <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200 bg-white">
             <div class="px-4 py-3 space-y-1">
                 <a href="{% url 'feed' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
                     <i class="fas fa-home"></i> Home
@@ -264,15 +265,24 @@
 
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
+            const btn = document.getElementById('mobileMenuButton');
             if (menu) {
                 menu.classList.toggle('hidden');
+                if (btn) {
+                    const expanded = !menu.classList.contains('hidden');
+                    btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+                }
             }
         }
 
         function closeMobileMenu() {
             const menu = document.getElementById('mobileMenu');
+            const btn = document.getElementById('mobileMenuButton');
             if (menu) {
                 menu.classList.add('hidden');
+                if (btn) {
+                    btn.setAttribute('aria-expanded', 'false');
+                }
             }
         }
 

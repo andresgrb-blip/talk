@@ -1,27 +1,27 @@
 <!-- Reaction Picker Component -->
 <div class="reaction-picker hidden absolute bottom-full left-0 mb-2 bg-white rounded-full shadow-2xl p-2 flex space-x-1 z-50 border border-gray-200" id="reaction-picker-{{ post.id }}">
-    <button onclick="reactToPost({{ post.id }}, 'like')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Like">
+    <button data-post-id="{{ post.id }}" onclick="reactToPost(parseInt(this.dataset.postId), 'like')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Like">
         ❤️
     </button>
-    <button onclick="reactToPost({{ post.id }}, 'love')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Love">
+    <button data-post-id="{{ post.id }}" onclick="reactToPost(parseInt(this.dataset.postId), 'love')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Love">
         😍
     </button>
-    <button onclick="reactToPost({{ post.id }}, 'haha')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Haha">
+    <button data-post-id="{{ post.id }}" onclick="reactToPost(parseInt(this.dataset.postId), 'haha')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Haha">
         😂
     </button>
-    <button onclick="reactToPost({{ post.id }}, 'wow')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Wow">
+    <button data-post-id="{{ post.id }}" onclick="reactToPost(parseInt(this.dataset.postId), 'wow')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Wow">
         😮
     </button>
-    <button onclick="reactToPost({{ post.id }}, 'sad')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Sad">
+    <button data-post-id="{{ post.id }}" onclick="reactToPost(parseInt(this.dataset.postId), 'sad')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Sad">
         😢
     </button>
-    <button onclick="reactToPost({{ post.id }}, 'angry')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Angry">
+    <button data-post-id="{{ post.id }}" onclick="reactToPost(parseInt(this.dataset.postId), 'angry')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Angry">
         😠
     </button>
-    <button onclick="reactToPost({{ post.id }}, 'fire')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Fire">
+    <button data-post-id="{{ post.id }}" onclick="reactToPost(parseInt(this.dataset.postId), 'fire')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Fire">
         🔥
     </button>
-    <button onclick="reactToPost({{ post.id }}, 'clap')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Clap">
+    <button data-post-id="{{ post.id }}" onclick="reactToPost(parseInt(this.dataset.postId), 'clap')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Clap">
         👏
     </button>
 </div>

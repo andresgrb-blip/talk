@@ -11,7 +11,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <a href="{% url 'profile' story.author.username %}">
-                        <img src="{{ story.author.profile.profile_picture.url }}" 
+                        <img src="{% if story.author.profile.profile_picture %}{{ story.author.profile.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}" 
                              alt="{{ story.author.username }}"
                              class="w-10 h-10 rounded-full object-cover border-2 border-white">
                     </a>
@@ -57,7 +57,7 @@
             </video>
             {% elif story.text_content %}
             <div class="w-full h-full flex items-center justify-center p-8" 
-                 style="background-color: {{ story.background_color }};">
+                 data-bg-color="{{ story.background_color }}">
                 <p class="text-white text-2xl font-bold text-center break-words">
                     {{ story.text_content }}
                 </p>
@@ -100,6 +100,14 @@
 setTimeout(function() {
     window.location.href = '{% url "stories_list" %}';
 }, 5000);
+
+// Applica background color per text stories
+document.addEventListener('DOMContentLoaded', function() {
+    const el = document.querySelector('[data-bg-color]');
+    if (el) {
+        el.style.backgroundColor = el.dataset.bgColor;
+    }
+});
 
 // Registra visualizzazione
 fetch('{% url "view_story" story.id %}', {

@@ -20,7 +20,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <a href="{% url 'profile' follow.follower.user.username %}">
-                        <img src="{{ follow.follower.profile_picture.url }}" 
+                        <img src="{% if follow.follower.profile_picture %}{{ follow.follower.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}" 
                              alt="{{ follow.follower.user.username }}" 
                              class="w-12 h-12 rounded-full object-cover">
                     </a>

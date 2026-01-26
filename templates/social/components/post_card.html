@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between mb-4">
         <div class="flex items-center space-x-3">
             <a href="{% url 'profile' post.author.username %}">
-                <img src="{{ post.author.profile.profile_picture.url }}" 
+                <img src="{% if post.author.profile.profile_picture %}{{ post.author.profile.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}" 
                      alt="{{ post.author.username }}" 
                      class="w-12 h-12 rounded-full object-cover">
             </a>
@@ -61,7 +61,7 @@
         <div class="flex items-center space-x-4">
             <!-- Reaction Button with Picker -->
             <div class="relative">
-                <button onclick="showReactionPicker({{ post.id }})" 
+                <button data-post-id="{{ post.id }}" onclick="showReactionPicker(parseInt(this.dataset.postId))" 
                         class="flex items-center space-x-2 text-gray-600 hover:text-pink-600 transition">
                     <i class="far fa-heart"></i>
                     <span>Reagisci</span>
@@ -78,7 +78,7 @@
 
             <!-- Share Button (Groups) -->
             {% if user.joined_groups.exists %}
-            <button onclick="showShareToGroup({{ post.id }})" 
+            <button data-post-id="{{ post.id }}" onclick="showShareToGroup(parseInt(this.dataset.postId))" 
                     class="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition">
                 <i class="fas fa-share"></i>
                 <span>Condividi</span>

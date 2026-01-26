@@ -109,7 +109,7 @@
                     <a href="{% url 'profile' member.username %}" 
                        class="member-item flex items-center space-x-3 hover:bg-gray-50 p-2 rounded-lg transition"
                        data-username="{{ member.username|lower }}">
-                        <img src="{{ member.profile.profile_picture.url }}" 
+                        <img src="{% if member.profile.profile_picture %}{{ member.profile.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}" 
                              alt="{{ member.username }}"
                              class="w-10 h-10 rounded-full object-cover">
                         <div class="flex-1">

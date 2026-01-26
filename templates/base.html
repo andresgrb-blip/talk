@@ -97,38 +97,91 @@
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                    <a href="{% url 'search' %}" class="text-gray-700 hover:text-pink-600">
-                        <i class="fas fa-search"></i>
-                    </a>
-                    <a href="{% url 'user_achievements' %}" class="text-gray-700 hover:text-yellow-600" title="Achievement">
-                        <i class="fas fa-trophy"></i>
-                    </a>
-                    <button onclick="toggleDarkMode()" class="text-gray-700 hover:text-pink-600" title="Dark Mode">
-                        <i class="fas fa-moon" id="darkModeIcon"></i>
-                    </button>
-                    <div class="relative">
-                        <button class="flex items-center space-x-2 text-gray-700 hover:text-pink-600" onclick="toggleDropdown()">
-                            <img src="{% if user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}" alt="{{ user.username }}" class="w-8 h-8 rounded-full object-cover">
-                            <i class="fas fa-chevron-down text-xs"></i>
+                    <div class="hidden md:flex items-center space-x-4">
+                        <a href="{% url 'search' %}" class="text-gray-700 hover:text-pink-600">
+                            <i class="fas fa-search"></i>
+                        </a>
+                        <a href="{% url 'user_achievements' %}" class="text-gray-700 hover:text-yellow-600" title="Achievement">
+                            <i class="fas fa-trophy"></i>
+                        </a>
+                        <button onclick="toggleDarkMode()" class="text-gray-700 hover:text-pink-600" title="Dark Mode">
+                            <i class="fas fa-moon" id="darkModeIcon"></i>
                         </button>
-                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                            <a href="{% url 'profile' user.username %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-user mr-2"></i> Il mio profilo
-                            </a>
-                            <a href="{% url 'user_achievements' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-trophy mr-2"></i> I miei Achievement
-                            </a>
-                            <a href="{% url 'leaderboard' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-crown mr-2"></i> Classifica
-                            </a>
-                            <a href="{% url 'edit_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-cog mr-2"></i> Impostazioni
-                            </a>
-                            <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                            </a>
+                        <div class="relative">
+                            <button class="flex items-center space-x-2 text-gray-700 hover:text-pink-600" onclick="toggleDropdown()">
+                                <img src="{% if user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}" alt="{{ user.username }}" class="w-8 h-8 rounded-full object-cover">
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                <a href="{% url 'profile' user.username %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i> Il mio profilo
+                                </a>
+                                <a href="{% url 'user_achievements' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-trophy mr-2"></i> I miei Achievement
+                                </a>
+                                <a href="{% url 'leaderboard' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-crown mr-2"></i> Classifica
+                                </a>
+                                <a href="{% url 'edit_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-cog mr-2"></i> Impostazioni
+                                </a>
+                                <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </a>
+                            </div>
                         </div>
                     </div>
+
+                    <button type="button" class="md:hidden text-gray-700 hover:text-pink-600" aria-controls="mobileMenu" aria-expanded="false" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200">
+            <div class="px-4 py-3 space-y-1">
+                <a href="{% url 'feed' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="{% url 'stories_list' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-fire"></i> Stories
+                </a>
+                <a href="{% url 'trending' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-hashtag"></i> Trending
+                </a>
+                <a href="{% url 'groups_list' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-users"></i> Gruppi
+                </a>
+                <a href="{% url 'notifications' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-bell"></i> Notifiche
+                </a>
+                <a href="{% url 'chat_list' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-comments"></i> Chat
+                </a>
+                <a href="{% url 'search' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-search"></i> Cerca
+                </a>
+                <a href="{% url 'user_achievements' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-trophy"></i> Achievement
+                </a>
+                <button type="button" onclick="toggleDarkMode()" class="w-full text-left block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-moon"></i> Dark Mode
+                </button>
+
+                <div class="border-t border-gray-200 mt-2 pt-2">
+                    <a href="{% url 'profile' user.username %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-user"></i> Il mio profilo
+                    </a>
+                    <a href="{% url 'leaderboard' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-crown"></i> Classifica
+                    </a>
+                    <a href="{% url 'edit_profile' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-cog"></i> Impostazioni
+                    </a>
+                    <a href="{% url 'logout' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
                 </div>
             </div>
         </div>
@@ -209,10 +262,41 @@
             document.getElementById('userDropdown').classList.toggle('hidden');
         }
 
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (menu) {
+                menu.classList.add('hidden');
+            }
+        }
+
         document.addEventListener('click', function(e) {
             const dropdown = document.getElementById('userDropdown');
             if (dropdown && !e.target.closest('.relative')) {
                 dropdown.classList.add('hidden');
+            }
+
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                const nav = document.querySelector('nav');
+                if (nav && !e.target.closest('nav')) {
+                    closeMobileMenu();
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (mobileMenu) {
+                mobileMenu.querySelectorAll('a').forEach((a) => {
+                    a.addEventListener('click', () => closeMobileMenu());
+                });
             }
         });
 

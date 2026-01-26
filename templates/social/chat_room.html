@@ -11,10 +11,14 @@
     </div>
 
     <div class="bg-white rounded-lg shadow-md overflow-hidden" style="height: 70vh; display: flex; flex-direction: column;">
-        <div class="bg-pink-600 text-white p-4">
+        <div class="bg-pink-600 text-white p-4 flex items-center justify-between">
             <h2 class="text-xl font-bold">
                 <i class="fas fa-comments"></i> {{ room_name }}
             </h2>
+            <a href="{% url 'call_room' room_name %}" class="inline-flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-medium">
+                <i class="fas fa-video"></i>
+                <span>Videochiama</span>
+            </a>
         </div>
 
         <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">

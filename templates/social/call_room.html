@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Videochiamata - Talkie{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4">
+    <div class="mb-4 flex items-center justify-between">
+        <a href="{% url 'chat_room' room_name %}" class="text-pink-600 hover:text-pink-700">
+            <i class="fas fa-arrow-left"></i> Torna alla chat
+        </a>
+        <div class="text-sm text-gray-600">Room: <span class="font-semibold text-gray-900">{{ room_name }}</span></div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-pink-600 text-white p-4 flex items-center justify-between">
+            <h2 class="text-xl font-bold">
+                <i class="fas fa-video"></i> Videochiamata
+            </h2>
+            <div class="flex items-center gap-2">
+                <button id="startCallBtn" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-sm font-medium">
+                    <i class="fas fa-phone"></i> Avvia
+                </button>
+                <button id="hangupBtn" class="px-4 py-2 bg-red-500/90 hover:bg-red-500 rounded-full text-sm font-medium" disabled>
+                    <i class="fas fa-phone-slash"></i> Chiudi
+                </button>
+            </div>
+        </div>
+
+        <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="relative">
+                <div class="text-sm font-semibold text-gray-700 mb-2">Tu</div>
+                <video id="localVideo" autoplay playsinline muted class="w-full aspect-video bg-black rounded-lg object-cover"></video>
+            </div>
+            <div class="relative">
+                <div class="text-sm font-semibold text-gray-700 mb-2">Altro</div>
+                <video id="remoteVideo" autoplay playsinline class="w-full aspect-video bg-black rounded-lg object-cover"></video>
+            </div>
+        </div>
+
+        <div class="px-4 pb-4">
+            <div id="callStatus" class="text-sm text-gray-600">Pronto.</div>
+        </div>
+    </div>
+</div>
+
+<script id="iceServersJson" type="application/json">{{ ice_servers_json|safe }}</script>
+
+<script>
+    const roomName = "{{ room_name }}";
+    const currentUserId = parseInt("{{ user.id }}");
+    const iceServers = JSON.parse(document.getElementById('iceServersJson').textContent || '[]');
+
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const startCallBtn = document.getElementById('startCallBtn');
+    const hangupBtn = document.getElementById('hangupBtn');
+    const callStatus = document.getElementById('callStatus');
+
+    const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const callSocket = new WebSocket(
+        wsScheme + '://' + window.location.host + '/ws/call/' + roomName + '/'
+    );
+
+    let pc = null;
+    let localStream = null;
+
+    function setStatus(text) {
+        callStatus.textContent = text;
+    }
+
+    function setButtons(inCall) {
+        hangupBtn.disabled = !inCall;
+        startCallBtn.disabled = inCall;
+    }
+
+    async function ensurePeerConnection() {
+        if (pc) return;
+
+        pc = new RTCPeerConnection({ iceServers });
+
+        pc.onicecandidate = (event) => {
+            if (event.candidate) {
+                callSocket.send(JSON.stringify({
+                    type: 'ice',
+                    payload: event.candidate
+                }));
+            }
+        };
+
+        pc.ontrack = (event) => {
+            remoteVideo.srcObject = event.streams[0];
+        };
+
+        pc.onconnectionstatechange = () => {
+            setStatus('Connessione: ' + pc.connectionState);
+            if (pc.connectionState === 'connected') {
+                setButtons(true);
+            }
+            if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected' || pc.connectionState === 'closed') {
+                setButtons(false);
+            }
+        };
+
+        pc.onnegotiationneeded = async () => {
+            try {
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                callSocket.send(JSON.stringify({
+                    type: 'offer',
+                    payload: pc.localDescription
+                }));
+                setStatus('Offerta inviata...');
+            } catch (e) {
+                console.error(e);
+                setStatus('Errore negoziazione.');
+            }
+        };
+    }
+
+    async function startLocalMedia() {
+        if (localStream) return;
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localVideo.srcObject = localStream;
+        } catch (e) {
+            console.error(e);
+            setStatus('Permessi camera/microfono negati o non disponibili.');
+            throw e;
+        }
+    }
+
+    async function startCall() {
+        setStatus('Avvio chiamata...');
+        await startLocalMedia();
+        await ensurePeerConnection();
+
+        localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
+        setButtons(true);
+    }
+
+    async function hangup() {
+        try {
+            callSocket.send(JSON.stringify({ type: 'hangup', payload: {} }));
+        } catch (e) {}
+
+        if (pc) {
+            pc.close();
+            pc = null;
+        }
+
+        if (localStream) {
+            localStream.getTracks().forEach(t => t.stop());
+            localStream = null;
+        }
+
+        localVideo.srcObject = null;
+        remoteVideo.srcObject = null;
+        setButtons(false);
+        setStatus('Chiamata chiusa.');
+    }
+
+    callSocket.onopen = () => {
+        setStatus('Connesso al signaling.');
+    };
+
+    callSocket.onmessage = async (e) => {
+        const data = JSON.parse(e.data);
+        if (data.user_id === currentUserId) return;
+
+        if (data.type === 'offer') {
+            setStatus('Offerta ricevuta...');
+            await startLocalMedia();
+            await ensurePeerConnection();
+
+            localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
+
+            await pc.setRemoteDescription(new RTCSessionDescription(data.payload));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+
+            callSocket.send(JSON.stringify({
+                type: 'answer',
+                payload: pc.localDescription
+            }));
+            setButtons(true);
+            setStatus('Risposta inviata.');
+        }
+
+        if (data.type === 'answer') {
+            setStatus('Risposta ricevuta...');
+            if (!pc) return;
+            await pc.setRemoteDescription(new RTCSessionDescription(data.payload));
+        }
+
+        if (data.type === 'ice') {
+            try {
+                if (pc && data.payload) {
+                    await pc.addIceCandidate(new RTCIceCandidate(data.payload));
+                }
+            } catch (err) {
+                console.error('ICE error', err);
+            }
+        }
+
+        if (data.type === 'hangup') {
+            await hangup();
+        }
+    };
+
+    callSocket.onclose = () => {
+        setStatus('Signaling disconnesso.');
+    };
+
+    startCallBtn.addEventListener('click', async () => {
+        try {
+            await startCall();
+        } catch (e) {}
+    });
+
+    hangupBtn.addEventListener('click', async () => {
+        await hangup();
+    });
+
+    window.addEventListener('beforeunload', () => {
+        try { callSocket.close(); } catch (e) {}
+        if (pc) {
+            try { pc.close(); } catch (e) {}
+        }
+        if (localStream) {
+            localStream.getTracks().forEach(t => t.stop());
+        }
+    });
+</script>
+{% endblock %}

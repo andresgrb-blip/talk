@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.conf import settings
+import json
 from .models import ChatRoom, Message
 
 
@@ -43,3 +45,18 @@ def start_chat(request, username):
     chat_room.participants.add(request.user, other_user)
     
     return redirect('chat_room', room_name=room_name)
+
+
+@login_required
+def call_room(request, room_name):
+    chat_room, created = ChatRoom.objects.get_or_create(name=room_name)
+
+    if request.user not in chat_room.participants.all():
+        chat_room.participants.add(request.user)
+
+    context = {
+        'room_name': room_name,
+        'chat_room': chat_room,
+        'ice_servers_json': json.dumps(getattr(settings, 'WEBRTC_ICE_SERVERS', [])),
+    }
+    return render(request, 'social/call_room.html', context)

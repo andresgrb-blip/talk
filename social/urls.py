@@ -23,6 +23,7 @@ urlpatterns = [
     path('chat/', chat_views.chat_list, name='chat_list'),
     path('chat/<str:room_name>/', chat_views.chat_room, name='chat_room'),
     path('chat/start/<str:username>/', chat_views.start_chat, name='start_chat'),
+    path('call/<str:room_name>/', chat_views.call_room, name='call_room'),
     
     # Stories
     path('stories/', story_views.stories_list, name='stories_list'),

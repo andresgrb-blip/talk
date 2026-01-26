@@ -151,3 +151,55 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'type': 'history',
             'messages': history
         }))
+
+
+class CallConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope["user"]
+        if self.user.is_anonymous:
+            await self.close()
+            return
+
+        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.room_group_name = f'call_{self.room_name}'
+
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        if hasattr(self, 'room_group_name'):
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        message_type = data.get('type')
+        payload = data.get('payload', {})
+
+        if message_type not in {'offer', 'answer', 'ice', 'hangup'}:
+            return
+
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'call_message',
+                'message_type': message_type,
+                'payload': payload,
+                'user_id': self.user.id,
+                'username': self.user.username,
+            }
+        )
+
+    async def call_message(self, event):
+        await self.send(text_data=json.dumps({
+            'type': event['message_type'],
+            'payload': event.get('payload', {}),
+            'user_id': event.get('user_id'),
+            'username': event.get('username'),
+        }))

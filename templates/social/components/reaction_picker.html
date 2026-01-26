@@ -1,0 +1,91 @@
+<!-- Reaction Picker Component -->
+<div class="reaction-picker hidden absolute bottom-full left-0 mb-2 bg-white rounded-full shadow-2xl p-2 flex space-x-1 z-50 border border-gray-200" id="reaction-picker-{{ post.id }}">
+    <button onclick="reactToPost({{ post.id }}, 'like')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Like">
+        ❤️
+    </button>
+    <button onclick="reactToPost({{ post.id }}, 'love')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Love">
+        😍
+    </button>
+    <button onclick="reactToPost({{ post.id }}, 'haha')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Haha">
+        😂
+    </button>
+    <button onclick="reactToPost({{ post.id }}, 'wow')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Wow">
+        😮
+    </button>
+    <button onclick="reactToPost({{ post.id }}, 'sad')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Sad">
+        😢
+    </button>
+    <button onclick="reactToPost({{ post.id }}, 'angry')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Angry">
+        😠
+    </button>
+    <button onclick="reactToPost({{ post.id }}, 'fire')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Fire">
+        🔥
+    </button>
+    <button onclick="reactToPost({{ post.id }}, 'clap')" class="reaction-btn hover:scale-125 transition-transform duration-200 text-2xl p-2 rounded-full hover:bg-gray-100" title="Clap">
+        👏
+    </button>
+</div>
+
+<script>
+function showReactionPicker(postId) {
+    const picker = document.getElementById('reaction-picker-' + postId);
+    document.querySelectorAll('.reaction-picker').forEach(p => {
+        if (p.id !== 'reaction-picker-' + postId) {
+            p.classList.add('hidden');
+        }
+    });
+    picker.classList.toggle('hidden');
+}
+
+function reactToPost(postId, reactionType) {
+    fetch(`/post/${postId}/react/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: `reaction_type=${reactionType}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateReactionDisplay(postId, data);
+            document.getElementById('reaction-picker-' + postId).classList.add('hidden');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updateReactionDisplay(postId, data) {
+    const container = document.getElementById('reactions-' + postId);
+    if (!container) return;
+    
+    const reactionIcons = {
+        'like': '❤️',
+        'love': '😍',
+        'haha': '😂',
+        'wow': '😮',
+        'sad': '😢',
+        'angry': '😠',
+        'fire': '🔥',
+        'clap': '👏'
+    };
+    
+    let html = '';
+    for (const [type, count] of Object.entries(data.reactions_count)) {
+        html += `<span class="inline-flex items-center">${reactionIcons[type]} ${count}</span>`;
+    }
+    
+    if (data.total_reactions > 0) {
+        html += `<span class="text-gray-600 ml-2">${data.total_reactions}</span>`;
+    }
+    
+    container.innerHTML = html || '<span class="text-gray-500">Nessuna reazione</span>';
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.reaction-picker') && !e.target.closest('[onclick*="showReactionPicker"]')) {
+        document.querySelectorAll('.reaction-picker').forEach(p => p.classList.add('hidden'));
+    }
+});
+</script>

@@ -1,0 +1,5 @@
+Social network zone4love
+Linguaggio: python
+Librerie: django
+database: postgresql
+stile: tailwindcss

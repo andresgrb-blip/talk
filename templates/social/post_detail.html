@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Post - Zone4Love{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4">
+    <div class="mb-4">
+        <a href="javascript:history.back()" class="text-pink-600 hover:text-pink-700">
+            <i class="fas fa-arrow-left"></i> Indietro
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md mb-6">
+        <div class="p-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'profile' post.author.username %}">
+                        <img src="{{ post.author.profile.profile_picture.url }}" 
+                             alt="{{ post.author.username }}" 
+                             class="w-12 h-12 rounded-full object-cover">
+                    </a>
+                    <div>
+                        <a href="{% url 'profile' post.author.username %}" 
+                           class="font-semibold text-gray-900 hover:text-pink-600">
+                            {{ post.author.get_full_name|default:post.author.username }}
+                        </a>
+                        <p class="text-sm text-gray-500">@{{ post.author.username }} · {{ post.created_at|date:"d M Y, H:i" }}</p>
+                    </div>
+                </div>
+                
+                {% if post.author == user %}
+                <a href="{% url 'delete_post' post.id %}" 
+                   onclick="return confirm('Sei sicuro di voler eliminare questo post?')"
+                   class="text-gray-400 hover:text-red-600">
+                    <i class="fas fa-trash"></i>
+                </a>
+                {% endif %}
+            </div>
+            
+            <p class="text-gray-800 text-lg mb-4 whitespace-pre-wrap">{{ post.content }}</p>
+            
+            {% if post.image %}
+            <img src="{{ post.image.url }}" 
+                 alt="Post image" 
+                 class="w-full rounded-lg mb-4">
+            {% endif %}
+            
+            <div class="flex items-center space-x-6 pt-4 border-t border-gray-200">
+                <button onclick="likePost(parseInt('{{ post.id }}'))" 
+                        class="flex items-center space-x-2 {% if user in post.likes.all %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 transition"
+                        id="like-btn-{{ post.id }}">
+                    <i class="fas fa-heart text-xl"></i>
+                    <span id="like-count-{{ post.id }}" class="font-semibold">{{ post.likes_count }}</span>
+                </button>
+                
+                <div class="flex items-center space-x-2 text-gray-500">
+                    <i class="fas fa-comment text-xl"></i>
+                    <span class="font-semibold">{{ post.comments_count }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Commenti</h3>
+        
+        <form method="post" class="mb-6">
+            {% csrf_token %}
+            <div class="flex items-start space-x-3">
+                <img src="{{ user.profile.profile_picture.url }}" 
+                     alt="{{ user.username }}" 
+                     class="w-10 h-10 rounded-full object-cover">
+                <div class="flex-1">
+                    <input type="text" name="content" 
+                           placeholder="Scrivi un commento..." 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500"
+                           required>
+                </div>
+                <button type="submit" 
+                        class="px-4 py-2 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </form>
+
+        {% for comment in comments %}
+        <div class="flex items-start space-x-3 mb-4 pb-4 border-b border-gray-100 last:border-0">
+            <a href="{% url 'profile' comment.author.username %}">
+                <img src="{{ comment.author.profile.profile_picture.url }}" 
+                     alt="{{ comment.author.username }}" 
+                     class="w-10 h-10 rounded-full object-cover">
+            </a>
+            <div class="flex-1">
+                <div class="bg-gray-100 rounded-lg px-4 py-2">
+                    <a href="{% url 'profile' comment.author.username %}" 
+                       class="font-semibold text-gray-900 hover:text-pink-600">
+                        {{ comment.author.get_full_name|default:comment.author.username }}
+                    </a>
+                    <p class="text-gray-800">{{ comment.content }}</p>
+                </div>
+                <div class="flex items-center space-x-4 mt-1 text-xs text-gray-500">
+                    <span>{{ comment.created_at|timesince }} fa</span>
+                    {% if comment.author == user %}
+                    <a href="{% url 'delete_comment' comment.id %}" 
+                       onclick="return confirm('Eliminare questo commento?')"
+                       class="text-red-600 hover:text-red-700">
+                        Elimina
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-gray-500 py-4">Nessun commento ancora. Sii il primo a commentare!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

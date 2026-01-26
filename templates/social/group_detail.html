@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ group.name }} - Zone4Love{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-6">
+    <!-- Group Header -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+        {% if group.cover_image %}
+        <img src="{{ group.cover_image.url }}" alt="{{ group.name }}" class="w-full h-48 object-cover">
+        {% else %}
+        <div class="w-full h-48 bg-gradient-to-r from-pink-400 via-purple-500 to-blue-500"></div>
+        {% endif %}
+        
+        <div class="p-6">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                        {{ group.name }}
+                        {% if group.is_private %}
+                        <i class="fas fa-lock text-xl text-gray-400"></i>
+                        {% endif %}
+                    </h1>
+                    <p class="text-gray-600 mb-4">{{ group.description }}</p>
+                    <div class="flex items-center space-x-4 text-sm text-gray-500">
+                        <span><i class="fas fa-users"></i> {{ group.members_count }} membri</span>
+                        <span><i class="fas fa-user"></i> Creato da @{{ group.creator.username }}</span>
+                        <span><i class="fas fa-calendar"></i> {{ group.created_at|date:"d M Y" }}</span>
+                    </div>
+                </div>
+                
+                {% if not is_member %}
+                <button data-group-id="{{ group.id }}" id="joinBtn"
+                        class="px-6 py-2 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition shadow-lg">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Unisciti
+                </button>
+                {% else %}
+                <button data-group-id="{{ group.id }}" id="leaveBtn"
+                        class="px-6 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    Lascia
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-4">
+            <h2 class="text-xl font-bold text-gray-900">Post del Gruppo</h2>
+            
+            {% if posts %}
+            {% for group_post in posts %}
+            <div class="relative">
+                {% if group_post.pinned %}
+                <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold z-10">
+                    <i class="fas fa-thumbtack"></i> Fissato
+                </div>
+                {% endif %}
+                {% include 'social/components/post_card.html' with post=group_post.post %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">Nessun Post</h3>
+                <p class="text-gray-500">Sii il primo a postare in questo gruppo!</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-4">
+            <!-- Search Members (Admin) -->
+            {% if is_admin %}
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h3 class="font-bold text-gray-900 mb-4">
+                    <i class="fas fa-user-plus text-pink-600"></i> Invita Membri
+                </h3>
+                <form id="searchMembersForm" class="mb-4">
+                    <div class="relative">
+                        <input type="text" 
+                               id="memberSearch" 
+                               placeholder="Cerca utenti..."
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                        <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                </form>
+                <div id="searchResults" class="space-y-2 max-h-64 overflow-y-auto"></div>
+            </div>
+            {% endif %}
+
+            <!-- Members -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h3 class="font-bold text-gray-900 mb-4">Membri ({{ group.members_count }})</h3>
+                
+                <!-- Search within members -->
+                <div class="mb-4">
+                    <input type="text" 
+                           id="filterMembers" 
+                           placeholder="Filtra membri..."
+                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                </div>
+                
+                <div id="membersList" class="space-y-3">
+                    {% for member in members %}
+                    <a href="{% url 'profile' member.username %}" 
+                       class="member-item flex items-center space-x-3 hover:bg-gray-50 p-2 rounded-lg transition"
+                       data-username="{{ member.username|lower }}">
+                        <img src="{{ member.profile.profile_picture.url }}" 
+                             alt="{{ member.username }}"
+                             class="w-10 h-10 rounded-full object-cover">
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900 text-sm">{{ member.username }}</p>
+                            {% if member == group.creator %}
+                            <p class="text-xs text-pink-600">👑 Creatore</p>
+                            {% endif %}
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Group Info -->
+            {% if is_admin %}
+            <div class="bg-pink-50 rounded-lg p-4 border border-pink-200">
+                <h4 class="font-semibold text-gray-900 mb-2">
+                    <i class="fas fa-crown text-pink-600"></i> Pannello Admin
+                </h4>
+                <p class="text-sm text-gray-600 mb-3">Hai i permessi di amministratore per questo gruppo.</p>
+                <div class="space-y-2">
+                    <button onclick="alert('Funzionalità in arrivo!')" 
+                            class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition">
+                        <i class="fas fa-cog mr-2"></i> Impostazioni Gruppo
+                    </button>
+                    <button onclick="alert('Funzionalità in arrivo!')" 
+                            class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-lg transition">
+                        <i class="fas fa-users-cog mr-2"></i> Gestisci Ruoli
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const joinBtn = document.getElementById('joinBtn');
+    const leaveBtn = document.getElementById('leaveBtn');
+    
+    if (joinBtn) {
+        joinBtn.addEventListener('click', function() {
+            const groupId = this.getAttribute('data-group-id');
+            fetch(`/groups/${groupId}/join/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.error);
+                }
+            });
+        });
+    }
+    
+    if (leaveBtn) {
+        leaveBtn.addEventListener('click', function() {
+            if (confirm('Sei sicuro di voler lasciare questo gruppo?')) {
+                const groupId = this.getAttribute('data-group-id');
+                fetch(`/groups/${groupId}/leave/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/groups/';
+                    } else {
+                        alert(data.error);
+                    }
+                });
+            }
+        });
+    }
+    
+    // Filter members
+    const filterInput = document.getElementById('filterMembers');
+    if (filterInput) {
+        filterInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            const members = document.querySelectorAll('.member-item');
+            
+            members.forEach(member => {
+                const username = member.getAttribute('data-username');
+                if (username.includes(query)) {
+                    member.style.display = 'flex';
+                } else {
+                    member.style.display = 'none';
+                }
+            });
+        });
+    }
+    
+    // Search users to invite (Admin only)
+    const memberSearch = document.getElementById('memberSearch');
+    if (memberSearch) {
+        let searchTimeout;
+        memberSearch.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+            
+            if (query.length < 2) {
+                document.getElementById('searchResults').innerHTML = '';
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => {
+                fetch(`/api/search/users/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let resultsHTML = '';
+                        
+                        if (data.users && data.users.length > 0) {
+                            data.users.forEach(user => {
+                                resultsHTML += `
+                                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+                                        <div class="flex items-center space-x-2">
+                                            <img src="${user.avatar}" class="w-8 h-8 rounded-full object-cover">
+                                            <div>
+                                                <p class="text-sm font-medium">${user.username}</p>
+                                                <p class="text-xs text-gray-500">${user.full_name}</p>
+                                            </div>
+                                        </div>
+                                        <button onclick="inviteUser('${user.username}', ${user.id})" 
+                                                class="px-3 py-1 bg-pink-600 text-white text-xs rounded-full hover:bg-pink-700">
+                                            Invita
+                                        </button>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            resultsHTML = '<p class="text-sm text-gray-500 text-center py-4">Nessun utente trovato</p>';
+                        }
+                        
+                        document.getElementById('searchResults').innerHTML = resultsHTML;
+                    })
+                    .catch(error => {
+                        console.error('Errore ricerca:', error);
+                        document.getElementById('searchResults').innerHTML = 
+                            '<p class="text-sm text-red-500 text-center py-4">Errore durante la ricerca</p>';
+                    });
+            }, 300);
+        });
+    }
+});
+
+function inviteUser(username, userId) {
+    if (confirm(`Vuoi invitare ${username} a questo gruppo?`)) {
+        alert(`Funzionalità invito in sviluppo!\nInviteresti: ${username} (ID: ${userId})`);
+        // TODO: Implementare invito utente al gruppo
+        // fetch(`/groups/${groupId}/invite/${userId}/`, { method: 'POST', ... })
+    }
+}
+</script>
+{% endblock %}

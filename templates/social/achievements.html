@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Achievement - {{ profile_user.username }} - Zone4Love{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-lg shadow-lg p-6 mb-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">
+                    🏆 Achievement di {{ profile_user.username }}
+                </h1>
+                <p class="text-yellow-100">
+                    {{ earned_count }} di {{ total_count }} sbloccati · {{ total_points }} punti totali
+                </p>
+            </div>
+            <div class="text-center">
+                <div class="text-5xl font-bold">{{ total_points }}</div>
+                <div class="text-sm text-yellow-100">Punti</div>
+            </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="mt-4">
+            <div class="bg-white bg-opacity-30 rounded-full h-4 overflow-hidden">
+                <div class="bg-white h-full rounded-full transition-all duration-500 progress-bar" 
+                     data-progress="{% widthratio earned_count total_count 100 %}"></div>
+            </div>
+            <p class="text-sm text-yellow-100 mt-1">
+                Progresso: {% widthratio earned_count total_count 100 %}%
+            </p>
+        </div>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const progressBar = document.querySelector('.progress-bar');
+                if (progressBar) {
+                    const progress = progressBar.getAttribute('data-progress');
+                    progressBar.style.width = progress + '%';
+                }
+            });
+        </script>
+    </div>
+
+    <!-- Achievements Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for item in achievements_data %}
+        <div class="bg-white rounded-lg shadow-md p-6 {% if item.earned %}border-2 border-yellow-400{% else %}opacity-60{% endif %} transition hover:shadow-lg">
+            <div class="flex items-start space-x-4">
+                <div class="text-5xl {% if not item.earned %}grayscale{% endif %}">
+                    {{ item.achievement.icon }}
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">
+                        {{ item.achievement.get_name_display }}
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-2">
+                        {{ item.achievement.description }}
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {% if item.earned %}bg-yellow-100 text-yellow-800{% else %}bg-gray-100 text-gray-600{% endif %}">
+                            {{ item.achievement.points }} punti
+                        </span>
+                        {% if item.earned %}
+                        <span class="text-xs text-gray-500">
+                            Sbloccato {{ item.earned_at|timesince }} fa
+                        </span>
+                        {% else %}
+                        <span class="text-xs text-gray-400">
+                            <i class="fas fa-lock"></i> Bloccato
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Leaderboard Link -->
+    <div class="mt-6 text-center">
+        <a href="{% url 'leaderboard' %}" 
+           class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full hover:from-yellow-500 hover:to-orange-600 transition shadow-lg">
+            <i class="fas fa-trophy mr-2"></i>
+            Vedi Classifica Globale
+        </a>
+    </div>
+</div>
+
+<style>
+.grayscale {
+    filter: grayscale(100%);
+}
+</style>
+{% endblock %}

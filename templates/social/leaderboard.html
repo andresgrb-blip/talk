@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Classifica - Zone4Love{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg p-6 mb-6 text-white">
+        <h1 class="text-3xl font-bold mb-2">
+            👑 Classifica Globale
+        </h1>
+        <p class="text-purple-100">
+            Top 50 utenti per punti achievement
+        </p>
+        {% if user_rank %}
+        <p class="text-sm text-purple-100 mt-2">
+            La tua posizione: #{{ user_rank }}
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        {% if users %}
+        <div class="divide-y divide-gray-200">
+            {% for ranked_user in users %}
+            <div class="p-4 hover:bg-gray-50 transition {% if ranked_user.id == user.id %}bg-pink-50{% endif %}">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4 flex-1">
+                        <!-- Rank -->
+                        <div class="text-center w-12">
+                            {% if forloop.counter == 1 %}
+                            <span class="text-3xl">🥇</span>
+                            {% elif forloop.counter == 2 %}
+                            <span class="text-3xl">🥈</span>
+                            {% elif forloop.counter == 3 %}
+                            <span class="text-3xl">🥉</span>
+                            {% else %}
+                            <span class="text-xl font-bold text-gray-600">#{{ forloop.counter }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- User Info -->
+                        <a href="{% url 'profile' ranked_user.username %}" class="flex items-center space-x-3 flex-1">
+                            <img src="{{ ranked_user.profile.profile_picture.url }}" 
+                                 alt="{{ ranked_user.username }}"
+                                 class="w-12 h-12 rounded-full object-cover">
+                            <div>
+                                <p class="font-semibold text-gray-900 hover:text-pink-600">
+                                    {{ ranked_user.get_full_name|default:ranked_user.username }}
+                                </p>
+                                <p class="text-sm text-gray-500">@{{ ranked_user.username }}</p>
+                            </div>
+                        </a>
+
+                        <!-- Stats -->
+                        <div class="flex items-center space-x-6">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-yellow-600">
+                                    {{ ranked_user.total_points|default:0 }}
+                                </div>
+                                <div class="text-xs text-gray-500">Punti</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-lg font-semibold text-gray-700">
+                                    {{ ranked_user.achievements_count }}
+                                </div>
+                                <div class="text-xs text-gray-500">Achievement</div>
+                            </div>
+                        </div>
+
+                        <!-- View Button -->
+                        <a href="{% url 'user_achievements_detail' ranked_user.username %}" 
+                           class="px-4 py-2 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition text-sm">
+                            Vedi
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-12 text-center">
+            <i class="fas fa-trophy text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Nessun Dato</h3>
+            <p class="text-gray-500">Inizia a sbloccare achievement per apparire in classifica!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

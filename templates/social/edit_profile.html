@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifica Profilo - Zone4Love{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+            <i class="fas fa-user-edit text-pink-600"></i> Modifica Profilo
+        </h2>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="border-b border-gray-200 pb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Informazioni Account</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="{{ u_form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Username
+                        </label>
+                        {{ u_form.username }}
+                        {% if u_form.username.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ u_form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="{{ u_form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                Nome
+                            </label>
+                            {{ u_form.first_name }}
+                        </div>
+                        <div>
+                            <label for="{{ u_form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                Cognome
+                            </label>
+                            {{ u_form.last_name }}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ u_form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Email
+                        </label>
+                        {{ u_form.email }}
+                        {% if u_form.email.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ u_form.email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-b border-gray-200 pb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Informazioni Profilo</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="{{ p_form.bio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Bio
+                        </label>
+                        {{ p_form.bio }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ p_form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Località
+                        </label>
+                        {{ p_form.location }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ p_form.website.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Sito Web
+                        </label>
+                        {{ p_form.website }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ p_form.birth_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            Data di Nascita
+                        </label>
+                        {{ p_form.birth_date }}
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Immagini</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Immagine Profilo Attuale
+                        </label>
+                        <img src="{{ user.profile.profile_picture.url }}" 
+                             alt="Profile" 
+                             class="w-24 h-24 rounded-full object-cover mb-2">
+                        <label for="{{ p_form.profile_picture.id_for_label }}" 
+                               class="cursor-pointer inline-block px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
+                            <i class="fas fa-upload"></i> Cambia Immagine Profilo
+                        </label>
+                        {{ p_form.profile_picture }}
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Foto Copertina
+                        </label>
+                        {% if user.profile.cover_photo %}
+                        <img src="{{ user.profile.cover_photo.url }}" 
+                             alt="Cover" 
+                             class="w-full h-32 object-cover rounded-lg mb-2">
+                        {% endif %}
+                        <label for="{{ p_form.cover_photo.id_for_label }}" 
+                               class="cursor-pointer inline-block px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
+                            <i class="fas fa-upload"></i> Cambia Foto Copertina
+                        </label>
+                        {{ p_form.cover_photo }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-4">
+                <button type="submit" 
+                        class="flex-1 px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition font-medium">
+                    <i class="fas fa-save"></i> Salva Modifiche
+                </button>
+                <a href="{% url 'profile' user.username %}" 
+                   class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium text-center">
+                    Annulla
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input[type="text"], input[type="email"], input[type="url"], input[type="date"], textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+    }
+    input:focus, textarea:focus {
+        outline: none;
+        border-color: #ec4899;
+        box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+    }
+    input[type="file"] {
+        display: none;
+    }
+</style>
+{% endblock %}

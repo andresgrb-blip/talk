@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Crea Gruppo - Zone4Love{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">
+            <i class="fas fa-users text-pink-600"></i> Crea un Nuovo Gruppo
+        </h2>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome Gruppo *</label>
+                    {{ form.name }}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descrizione *</label>
+                    {{ form.description }}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Immagine Copertina</label>
+                    {{ form.cover_image }}
+                </div>
+
+                <div class="flex items-center">
+                    {{ form.is_private }}
+                    <label class="ml-2 text-sm text-gray-700">
+                        Gruppo Privato (solo su invito)
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+                <a href="{% url 'groups_list' %}" 
+                   class="px-6 py-2 text-gray-700 hover:text-gray-900 transition">
+                    Annulla
+                </a>
+                <button type="submit" 
+                        class="px-6 py-2 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition shadow-lg">
+                    <i class="fas fa-check mr-2"></i>
+                    Crea Gruppo
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

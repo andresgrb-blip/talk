@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile_user.username }} - Zone4Love{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+        {% if profile_user.profile.cover_photo %}
+        <img src="{{ profile_user.profile.cover_photo.url }}" 
+             alt="Cover photo" 
+             class="w-full h-64 object-cover">
+        {% else %}
+        <div class="w-full h-64 bg-gradient-to-r from-pink-400 to-purple-500"></div>
+        {% endif %}
+        
+        <div class="px-6 pb-6">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between -mt-16 md:-mt-20">
+                <div class="flex flex-col md:flex-row md:items-end md:space-x-4">
+                    <img src="{{ profile_user.profile.profile_picture.url }}" 
+                         alt="{{ profile_user.username }}" 
+                         class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
+                    
+                    <div class="mt-4 md:mt-0 md:mb-2">
+                        <h1 class="text-2xl font-bold text-gray-900">
+                            {{ profile_user.get_full_name|default:profile_user.username }}
+                        </h1>
+                        <p class="text-gray-600">@{{ profile_user.username }}</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4 md:mt-0 md:mb-2">
+                    {% if user == profile_user %}
+                    <a href="{% url 'edit_profile' %}" 
+                       class="inline-block px-6 py-2 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition font-medium">
+                        <i class="fas fa-edit"></i> Modifica profilo
+                    </a>
+                    {% else %}
+                    <div class="flex space-x-2">
+                        <form action="{% url 'follow_user' profile_user.username %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    class="px-6 py-2 {% if is_following %}bg-gray-200 text-gray-800 hover:bg-gray-300{% else %}bg-pink-600 text-white hover:bg-pink-700{% endif %} rounded-full transition font-medium">
+                                {% if is_following %}
+                                    <i class="fas fa-user-check"></i> Seguito
+                                {% else %}
+                                    <i class="fas fa-user-plus"></i> Segui
+                                {% endif %}
+                            </button>
+                        </form>
+                        <a href="{% url 'start_chat' profile_user.username %}" 
+                           class="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition font-medium">
+                            <i class="fas fa-comment"></i> Messaggio
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if profile_user.profile.bio %}
+            <p class="mt-4 text-gray-700">{{ profile_user.profile.bio }}</p>
+            {% endif %}
+            
+            <div class="mt-4 flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                {% if profile_user.profile.location %}
+                <span><i class="fas fa-map-marker-alt text-pink-600"></i> {{ profile_user.profile.location }}</span>
+                {% endif %}
+                {% if profile_user.profile.website %}
+                <a href="{{ profile_user.profile.website }}" target="_blank" class="hover:text-pink-600">
+                    <i class="fas fa-link text-pink-600"></i> {{ profile_user.profile.website }}
+                </a>
+                {% endif %}
+                <span><i class="fas fa-calendar text-pink-600"></i> Iscritto {{ profile_user.date_joined|date:"F Y" }}</span>
+            </div>
+            
+            <div class="mt-4 flex space-x-6">
+                <a href="{% url 'following' profile_user.username %}" class="hover:text-pink-600">
+                    <span class="font-bold text-gray-900">{{ profile_user.profile.following_count }}</span>
+                    <span class="text-gray-600"> Seguiti</span>
+                </a>
+                <a href="{% url 'followers' profile_user.username %}" class="hover:text-pink-600">
+                    <span class="font-bold text-gray-900">{{ profile_user.profile.followers_count }}</span>
+                    <span class="text-gray-600"> Follower</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+        <h2 class="text-xl font-bold text-gray-900">
+            <i class="fas fa-newspaper text-pink-600"></i> Post
+        </h2>
+    </div>
+
+    {% for post in posts %}
+    <div class="bg-white rounded-lg shadow-md mb-6">
+        <div class="p-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <img src="{{ post.author.profile.profile_picture.url }}" 
+                         alt="{{ post.author.username }}" 
+                         class="w-12 h-12 rounded-full object-cover">
+                    <div>
+                        <p class="font-semibold text-gray-900">
+                            {{ post.author.get_full_name|default:post.author.username }}
+                        </p>
+                        <p class="text-sm text-gray-500">@{{ post.author.username }} · {{ post.created_at|timesince }} fa</p>
+                    </div>
+                </div>
+                
+                {% if post.author == user %}
+                <a href="{% url 'delete_post' post.id %}" 
+                   onclick="return confirm('Sei sicuro di voler eliminare questo post?')"
+                   class="text-gray-400 hover:text-red-600">
+                    <i class="fas fa-trash"></i>
+                </a>
+                {% endif %}
+            </div>
+            
+            <p class="text-gray-800 mb-4 whitespace-pre-wrap">{{ post.content }}</p>
+            
+            {% if post.image %}
+            <img src="{{ post.image.url }}" 
+                 alt="Post image" 
+                 class="w-full rounded-lg mb-4 max-h-96 object-cover">
+            {% endif %}
+            
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <button onclick="likePost(parseInt('{{ post.id }}'))" 
+                        class="flex items-center space-x-2 {% if user in post.likes.all|slice:':100' %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 transition"
+                        id="like-btn-{{ post.id }}">
+                    <i class="fas fa-heart"></i>
+                    <span id="like-count-{{ post.id }}">{{ post.likes_count }}</span>
+                </button>
+                
+                <a href="{% url 'post_detail' post.id %}" 
+                   class="flex items-center space-x-2 text-gray-500 hover:text-pink-600 transition">
+                    <i class="fas fa-comment"></i>
+                    <span>{{ post.comments_count }}</span>
+                </a>
+                
+                <button class="text-gray-500 hover:text-pink-600 transition">
+                    <i class="fas fa-share"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+        <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">Nessun post ancora</h3>
+        <p class="text-gray-500">{% if user == profile_user %}Pubblica il tuo primo post!{% else %}Questo utente non ha ancora pubblicato nulla.{% endif %}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

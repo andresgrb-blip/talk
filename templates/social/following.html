@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Seguiti da {{ profile_user.username }} - Zone4Love{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4">
+    <div class="mb-4">
+        <a href="{% url 'profile' profile_user.username %}" class="text-pink-600 hover:text-pink-700">
+            <i class="fas fa-arrow-left"></i> Torna al profilo
+        </a>
+    </div>
+
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+        Seguiti da @{{ profile_user.username }}
+    </h2>
+
+    <div class="bg-white rounded-lg shadow-md">
+        {% for follow in following %}
+        <div class="p-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'profile' follow.following.user.username %}">
+                        <img src="{{ follow.following.profile_picture.url }}" 
+                             alt="{{ follow.following.user.username }}" 
+                             class="w-12 h-12 rounded-full object-cover">
+                    </a>
+                    <div>
+                        <a href="{% url 'profile' follow.following.user.username %}" 
+                           class="font-semibold text-gray-900 hover:text-pink-600">
+                            {{ follow.following.user.get_full_name|default:follow.following.user.username }}
+                        </a>
+                        <p class="text-sm text-gray-500">@{{ follow.following.user.username }}</p>
+                        {% if follow.following.bio %}
+                        <p class="text-sm text-gray-600 mt-1">{{ follow.following.bio|truncatewords:15 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <a href="{% url 'profile' follow.following.user.username %}" 
+                   class="px-4 py-2 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition text-sm font-medium">
+                    Visualizza
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="p-8 text-center">
+            <i class="fas fa-user-friends text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Non segue nessuno</h3>
+            <p class="text-gray-500">Questo utente non segue ancora nessuno</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

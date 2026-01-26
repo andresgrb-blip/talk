@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat - Zone4Love{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+        <i class="fas fa-comments text-pink-600"></i> Messaggi
+    </h2>
+
+    <div class="bg-white rounded-lg shadow-md">
+        {% for room in chat_rooms %}
+        <a href="{% url 'chat_room' room.name %}" class="block p-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-comment-dots text-2xl text-pink-600"></i>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">{{ room.name }}</h3>
+                        <p class="text-sm text-gray-500">
+                            {% for participant in room.participants.all %}
+                                {% if participant != user %}{{ participant.username }}{% endif %}
+                            {% endfor %}
+                        </p>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+            </div>
+        </a>
+        {% empty %}
+        <div class="p-8 text-center">
+            <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Nessuna conversazione</h3>
+            <p class="text-gray-500">Inizia una nuova chat visitando il profilo di un utente!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

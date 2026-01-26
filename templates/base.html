@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Talkie{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        /* Dark Mode */
+        .dark {
+            color-scheme: dark;
+        }
+        .dark body {
+            background-color: #1f2937;
+            color: #f9fafb;
+        }
+        .dark nav {
+            background-color: #111827;
+            border-bottom: 1px solid #374151;
+        }
+        .dark .bg-white {
+            background-color: #1f2937;
+        }
+        .dark .text-gray-900 {
+            color: #f9fafb;
+        }
+        .dark .text-gray-700 {
+            color: #d1d5db;
+        }
+        .dark .text-gray-600 {
+            color: #9ca3af;
+        }
+        .dark .text-gray-500 {
+            color: #6b7280;
+        }
+        .dark .border-gray-200 {
+            border-color: #374151;
+        }
+        .dark .bg-gray-50 {
+            background-color: #111827;
+        }
+        .dark .bg-gray-100 {
+            background-color: #1f2937;
+        }
+        .dark .shadow-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    {% if user.is_authenticated %}
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    <a href="{% url 'feed' %}" class="text-2xl font-bold text-pink-600">
+                        <i class="fas fa-heart"></i> Talkie
+                    </a>
+                    <div class="hidden md:flex space-x-4">
+                        <a href="{% url 'feed' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                        <a href="{% url 'stories_list' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-fire"></i> Stories
+                        </a>
+                        <a href="{% url 'trending' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-hashtag"></i> Trending
+                        </a>
+                        <a href="{% url 'groups_list' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-users"></i> Gruppi
+                        </a>
+                        <a href="{% url 'notifications' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium relative">
+                            <i class="fas fa-bell"></i> Notifiche
+                            <span id="notification-badge" class="hidden absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                                0
+                            </span>
+                        </a>
+                        <a href="{% url 'chat_list' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-comments"></i> Chat
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'search' %}" class="text-gray-700 hover:text-pink-600">
+                        <i class="fas fa-search"></i>
+                    </a>
+                    <a href="{% url 'user_achievements' %}" class="text-gray-700 hover:text-yellow-600" title="Achievement">
+                        <i class="fas fa-trophy"></i>
+                    </a>
+                    <button onclick="toggleDarkMode()" class="text-gray-700 hover:text-pink-600" title="Dark Mode">
+                        <i class="fas fa-moon" id="darkModeIcon"></i>
+                    </button>
+                    <div class="relative">
+                        <button class="flex items-center space-x-2 text-gray-700 hover:text-pink-600" onclick="toggleDropdown()">
+                            <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}" class="w-8 h-8 rounded-full object-cover">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                            <a href="{% url 'profile' user.username %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i> Il mio profilo
+                            </a>
+                            <a href="{% url 'user_achievements' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-trophy mr-2"></i> I miei Achievement
+                            </a>
+                            <a href="{% url 'leaderboard' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-crown mr-2"></i> Classifica
+                            </a>
+                            <a href="{% url 'edit_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i> Impostazioni
+                            </a>
+                            <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    {% if messages %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        {% for message in messages %}
+        <div class="{% if message.tags == 'error' %}bg-red-100 border-red-400 text-red-700{% elif message.tags == 'success' %}bg-green-100 border-green-400 text-green-700{% else %}bg-blue-100 border-blue-400 text-blue-700{% endif %} border px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main class="{% if user.is_authenticated %}py-8{% endif %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if user.is_authenticated %}
+    <script>
+        // WebSocket per notifiche real-time
+        const notificationSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/notifications/'
+        );
+
+        notificationSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            
+            if (data.type === 'notification') {
+                showNotificationToast(data.notification);
+                updateNotificationBadge();
+            } else if (data.type === 'new_post') {
+                showNewPostToast(data.post);
+            } else if (data.type === 'new_comment') {
+                showNewCommentToast(data.comment);
+            }
+        };
+
+        notificationSocket.onclose = function(e) {
+            console.error('Notification socket closed');
+        };
+
+        function showNotificationToast(notification) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 right-4 bg-white shadow-lg rounded-lg p-4 max-w-sm z-50 border-l-4 border-pink-600 animate-slide-in';
+            toast.innerHTML = `
+                <div class="flex items-start">
+                    <i class="fas fa-bell text-pink-600 text-xl mr-3 mt-1"></i>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">${notification.message}</p>
+                        <p class="text-sm text-gray-500">Adesso</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notification-badge');
+            if (badge) {
+                const currentCount = parseInt(badge.textContent) || 0;
+                badge.textContent = currentCount + 1;
+                badge.classList.remove('hidden');
+            }
+        }
+
+        function toggleDropdown() {
+            document.getElementById('userDropdown').classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown && !e.target.closest('.relative')) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Dark Mode
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('darkModeIcon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('darkMode', 'false');
+            } else {
+                html.classList.add('dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('darkMode', 'true');
+            }
+        }
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+            const icon = document.getElementById('darkModeIcon');
+            if (icon) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
+
+        function showNewPostToast(post) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 right-4 bg-white shadow-lg rounded-lg p-4 max-w-md z-50 border-l-4 border-blue-600 animate-slide-in cursor-pointer hover:shadow-xl transition';
+            toast.onclick = function() {
+                window.location.href = `/profile/${post.author}/`;
+            };
+            toast.innerHTML = `
+                <div class="flex items-start">
+                    <i class="fas fa-plus-circle text-blue-600 text-xl mr-3 mt-1"></i>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">${escapeHtml(post.message)}</p>
+                        <p class="text-sm text-gray-700 mt-1">${escapeHtml(post.content)}</p>
+                        ${post.has_image ? '<p class="text-xs text-gray-500 mt-1"><i class="fas fa-image"></i> Con immagine</p>' : ''}
+                        <p class="text-xs text-gray-500 mt-2">Clicca per visualizzare</p>
+                    </div>
+                    <button onclick="event.stopPropagation(); this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 8000);
+        }
+
+        function showNewCommentToast(comment) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 right-4 bg-white shadow-lg rounded-lg p-4 max-w-md z-50 border-l-4 border-green-600 animate-slide-in cursor-pointer hover:shadow-xl transition';
+            toast.onclick = function() {
+                window.location.href = `/post/${comment.post_id}/`;
+            };
+            toast.innerHTML = `
+                <div class="flex items-start">
+                    <i class="fas fa-comment text-green-600 text-xl mr-3 mt-1"></i>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">${escapeHtml(comment.message)}</p>
+                        <p class="text-sm text-gray-700 mt-1">"${escapeHtml(comment.content)}"</p>
+                        <p class="text-xs text-gray-500 mt-2">Clicca per visualizzare</p>
+                    </div>
+                    <button onclick="event.stopPropagation(); this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 8000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+    {% endif %}
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function likePost(postId) {
+            const csrftoken = getCookie('csrftoken');
+            
+            fetch(`/post/${postId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const likeBtn = document.querySelector(`#like-btn-${postId}`);
+                const likeCount = document.querySelector(`#like-count-${postId}`);
+                
+                if (data.liked) {
+                    likeBtn.classList.remove('text-gray-500');
+                    likeBtn.classList.add('text-red-500');
+                } else {
+                    likeBtn.classList.remove('text-red-500');
+                    likeBtn.classList.add('text-gray-500');
+                }
+                
+                likeCount.textContent = data.likes_count;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

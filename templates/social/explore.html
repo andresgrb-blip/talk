@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Esplora - Zone4Love{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+        <i class="fas fa-compass text-pink-600"></i> Esplora
+    </h2>
+
+    {% for post in posts %}
+    <div class="bg-white rounded-lg shadow-md mb-6">
+        <div class="p-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'profile' post.author.username %}">
+                        <img src="{{ post.author.profile.profile_picture.url }}" 
+                             alt="{{ post.author.username }}" 
+                             class="w-12 h-12 rounded-full object-cover">
+                    </a>
+                    <div>
+                        <a href="{% url 'profile' post.author.username %}" 
+                           class="font-semibold text-gray-900 hover:text-pink-600">
+                            {{ post.author.get_full_name|default:post.author.username }}
+                        </a>
+                        <p class="text-sm text-gray-500">@{{ post.author.username }} · {{ post.created_at|timesince }} fa</p>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-gray-800 mb-4 whitespace-pre-wrap">{{ post.content }}</p>
+            
+            {% if post.image %}
+            <img src="{{ post.image.url }}" 
+                 alt="Post image" 
+                 class="w-full rounded-lg mb-4 max-h-96 object-cover">
+            {% endif %}
+            
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <button onclick="likePost(parseInt('{{ post.id }}'))" 
+                        class="flex items-center space-x-2 {% if user in post.likes.all|slice:':100' %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 transition"
+                        id="like-btn-{{ post.id }}">
+                    <i class="fas fa-heart"></i>
+                    <span id="like-count-{{ post.id }}">{{ post.likes_count }}</span>
+                </button>
+                
+                <a href="{% url 'post_detail' post.id %}" 
+                   class="flex items-center space-x-2 text-gray-500 hover:text-pink-600 transition">
+                    <i class="fas fa-comment"></i>
+                    <span>{{ post.comments_count }}</span>
+                </a>
+                
+                <button class="text-gray-500 hover:text-pink-600 transition">
+                    <i class="fas fa-share"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+        <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">Nessun post disponibile</h3>
+        <p class="text-gray-500">Sii il primo a pubblicare qualcosa!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

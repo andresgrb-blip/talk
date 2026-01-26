@@ -1,0 +1,99 @@
+<!-- Post Card Component with Reactions -->
+<div class="bg-white rounded-lg shadow-md p-6 mb-4">
+    <!-- Post Header -->
+    <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'profile' post.author.username %}">
+                <img src="{{ post.author.profile.profile_picture.url }}" 
+                     alt="{{ post.author.username }}" 
+                     class="w-12 h-12 rounded-full object-cover">
+            </a>
+            <div>
+                <a href="{% url 'profile' post.author.username %}" 
+                   class="font-semibold text-gray-900 hover:text-pink-600">
+                    {{ post.author.get_full_name|default:post.author.username }}
+                </a>
+                <p class="text-sm text-gray-500">@{{ post.author.username }} · {{ post.created_at|timesince }} fa</p>
+            </div>
+        </div>
+        {% if post.author == user %}
+        <a href="{% url 'delete_post' post.id %}" 
+           onclick="return confirm('Sei sicuro di voler eliminare questo post?')"
+           class="text-gray-400 hover:text-red-600">
+            <i class="fas fa-trash"></i>
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Post Content -->
+    <div class="mb-4">
+        <p class="text-gray-800 whitespace-pre-wrap post-content">{{ post.content|urlize }}</p>
+    </div>
+
+    <!-- Post Image -->
+    {% if post.image %}
+    <div class="mb-4">
+        <img src="{{ post.image.url }}" 
+             alt="Post image" 
+             class="w-full rounded-lg object-cover max-h-96">
+    </div>
+    {% endif %}
+
+    <!-- Reactions Summary -->
+    <div id="reactions-{{ post.id }}" class="flex items-center space-x-2 text-sm mb-3 min-h-6">
+        {% if post.reactions.all or post.likes.all %}
+            {% for reaction_type, count in post.reactions.values_list|dictsort:"reaction_type" %}
+                {% if count > 0 %}
+                <span class="inline-flex items-center">
+                    {% if reaction_type == 'like' %}❤️{% elif reaction_type == 'love' %}😍{% elif reaction_type == 'haha' %}😂{% elif reaction_type == 'wow' %}😮{% elif reaction_type == 'sad' %}😢{% elif reaction_type == 'angry' %}😠{% elif reaction_type == 'fire' %}🔥{% elif reaction_type == 'clap' %}👏{% endif %}
+                    {{ count }}
+                </span>
+                {% endif %}
+            {% endfor %}
+            <span class="text-gray-600">{{ post.reactions.count|add:post.likes.count }}</span>
+        {% else %}
+            <span class="text-gray-500">Nessuna reazione</span>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+        <div class="flex items-center space-x-4">
+            <!-- Reaction Button with Picker -->
+            <div class="relative">
+                <button onclick="showReactionPicker({{ post.id }})" 
+                        class="flex items-center space-x-2 text-gray-600 hover:text-pink-600 transition">
+                    <i class="far fa-heart"></i>
+                    <span>Reagisci</span>
+                </button>
+                {% include 'social/components/reaction_picker.html' %}
+            </div>
+
+            <!-- Comment Button -->
+            <a href="{% url 'post_detail' post.id %}" 
+               class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition">
+                <i class="far fa-comment"></i>
+                <span>{{ post.comments.count }}</span>
+            </a>
+
+            <!-- Share Button (Groups) -->
+            {% if user.joined_groups.exists %}
+            <button onclick="showShareToGroup({{ post.id }})" 
+                    class="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition">
+                <i class="fas fa-share"></i>
+                <span>Condividi</span>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.post-content a {
+    color: #ec4899;
+    text-decoration: underline;
+}
+.post-content a:hover {
+    color: #db2777;
+}
+</style>

@@ -2,7 +2,8 @@ from django.urls import path
 from . import views, chat_views, story_views, reaction_views, hashtag_views, achievement_views, group_views, api_views
 
 urlpatterns = [
-    path('', views.feed, name='feed'),
+    path('', views.home, name='home'),
+    path('feed/', views.feed, name='feed'),
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),

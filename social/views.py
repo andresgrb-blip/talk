@@ -11,6 +11,12 @@ from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, PostForm
 from .hashtag_views import process_post_hashtags
 
 
+def home(request):
+    if request.user.is_authenticated:
+        return redirect('feed')
+    return render(request, 'social/home.html')
+
+
 def register(request):
     if request.user.is_authenticated:
         return redirect('feed')

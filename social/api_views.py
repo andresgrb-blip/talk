@@ -27,7 +27,7 @@ def search_users_api(request):
             'id': user.id,
             'username': user.username,
             'full_name': user.get_full_name() or user.username,
-            'avatar': user.profile.profile_picture.url if hasattr(user, 'profile') and user.profile.profile_picture else '/static/default-avatar.png'
+            'avatar': user.profile.profile_picture.url if hasattr(user, 'profile') and user.profile.profile_picture else '/media/profile_pics/default.jpg'
         })
     
     return JsonResponse({'users': users_data})

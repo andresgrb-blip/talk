@@ -75,8 +75,11 @@
                         <a href="{% url 'feed' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium">
                             <i class="fas fa-home"></i> Home
                         </a>
-                        <a href="{% url 'stories_list' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <a href="{% url 'stories_list' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium relative">
                             <i class="fas fa-fire"></i> Stories
+                            <span id="stories-badge" class="hidden absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                                0
+                            </span>
                         </a>
                         <a href="{% url 'trending' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium">
                             <i class="fas fa-hashtag"></i> Trending
@@ -84,14 +87,20 @@
                         <a href="{% url 'groups_list' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium">
                             <i class="fas fa-users"></i> Gruppi
                         </a>
+                        <a href="{% url 'random_chat' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-random"></i> Random
+                        </a>
                         <a href="{% url 'notifications' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium relative">
                             <i class="fas fa-bell"></i> Notifiche
                             <span id="notification-badge" class="hidden absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
                                 0
                             </span>
                         </a>
-                        <a href="{% url 'chat_list' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <a href="{% url 'chat_list' %}" class="text-gray-700 hover:text-pink-600 px-3 py-2 rounded-md text-sm font-medium relative">
                             <i class="fas fa-comments"></i> Chat
+                            <span id="chat-badge" class="hidden absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                                0
+                            </span>
                         </a>
                     </div>
                 </div>
@@ -145,8 +154,11 @@
                 <a href="{% url 'feed' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
                     <i class="fas fa-home"></i> Home
                 </a>
-                <a href="{% url 'stories_list' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                <a href="{% url 'stories_list' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 relative">
                     <i class="fas fa-fire"></i> Stories
+                    <span id="stories-badge-menu" class="hidden absolute top-2 right-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                        0
+                    </span>
                 </a>
                 <a href="{% url 'trending' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
                     <i class="fas fa-hashtag"></i> Trending
@@ -154,11 +166,20 @@
                 <a href="{% url 'groups_list' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
                     <i class="fas fa-users"></i> Gruppi
                 </a>
-                <a href="{% url 'notifications' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
-                    <i class="fas fa-bell"></i> Notifiche
+                <a href="{% url 'random_chat' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                    <i class="fas fa-random"></i> Random Chat
                 </a>
-                <a href="{% url 'chat_list' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                <a href="{% url 'notifications' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 relative">
+                    <i class="fas fa-bell"></i> Notifiche
+                    <span id="notification-badge-menu" class="hidden absolute top-2 right-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                        0
+                    </span>
+                </a>
+                <a href="{% url 'chat_list' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 relative">
                     <i class="fas fa-comments"></i> Chat
+                    <span id="chat-badge-menu" class="hidden absolute top-2 right-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                        0
+                    </span>
                 </a>
                 <a href="{% url 'search' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
                     <i class="fas fa-search"></i> Cerca
@@ -199,34 +220,34 @@
     </div>
     {% endif %}
 
-    <main class="{% if user.is_authenticated %}py-8 pb-24 md:pb-8{% endif %}">
+    <main class="{% if user.is_authenticated %}py-6 md:py-8 pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-8{% endif %}">
         {% block content %}{% endblock %}
     </main>
 
     {% if user.is_authenticated %}
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-gray-200 z-50" style="padding-bottom: env(safe-area-inset-bottom);">
         <div class="max-w-7xl mx-auto px-2">
             <div class="grid grid-cols-5">
-                <a href="{% url 'feed' %}" class="flex flex-col items-center justify-center py-2 text-gray-600 hover:text-pink-600">
+                <a href="{% url 'feed' %}" class="flex flex-col items-center justify-center py-3 text-gray-600 hover:text-pink-600">
                     <i class="fas fa-home text-lg"></i>
                     <span class="text-[11px] mt-1">Home</span>
                 </a>
-                <a href="{% url 'search' %}" class="flex flex-col items-center justify-center py-2 text-gray-600 hover:text-pink-600">
+                <a href="{% url 'search' %}" class="flex flex-col items-center justify-center py-3 text-gray-600 hover:text-pink-600">
                     <i class="fas fa-search text-lg"></i>
                     <span class="text-[11px] mt-1">Cerca</span>
                 </a>
-                <a href="{% url 'create_story' %}" class="flex flex-col items-center justify-center py-2 text-gray-600 hover:text-pink-600">
+                <a href="{% url 'create_story' %}" class="flex flex-col items-center justify-center py-3 text-gray-600 hover:text-pink-600">
                     <i class="fas fa-plus-circle text-2xl"></i>
                     <span class="text-[11px] mt-0.5">Crea</span>
                 </a>
-                <a href="{% url 'notifications' %}" class="flex flex-col items-center justify-center py-2 text-gray-600 hover:text-pink-600 relative">
+                <a href="{% url 'notifications' %}" class="flex flex-col items-center justify-center py-3 text-gray-600 hover:text-pink-600 relative">
                     <i class="fas fa-bell text-lg"></i>
                     <span class="text-[11px] mt-1">Notifiche</span>
                     <span id="notification-badge-mobile" class="hidden absolute top-1 right-5 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white bg-red-600 rounded-full">
                         0
                     </span>
                 </a>
-                <a href="{% url 'profile' user.username %}" class="flex flex-col items-center justify-center py-2 text-gray-600 hover:text-pink-600">
+                <a href="{% url 'profile' user.username %}" class="flex flex-col items-center justify-center py-3 text-gray-600 hover:text-pink-600">
                     <img src="{% if user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}/media/profile_pics/default.jpg{% endif %}" alt="{{ user.username }}" class="w-6 h-6 rounded-full object-cover">
                     <span class="text-[11px] mt-1">Profilo</span>
                 </a>
@@ -236,8 +257,9 @@
 
     <script>
         // WebSocket per notifiche real-time
+        const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
         const notificationSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/notifications/'
+            wsScheme + '://' + window.location.host + '/ws/notifications/'
         );
 
         notificationSocket.onmessage = function(e) {
@@ -245,11 +267,13 @@
             
             if (data.type === 'notification') {
                 showNotificationToast(data.notification);
-                updateNotificationBadge();
+                refreshNotificationBadge();
             } else if (data.type === 'new_post') {
                 showNewPostToast(data.post);
             } else if (data.type === 'new_comment') {
                 showNewCommentToast(data.comment);
+            } else if (data.type === 'refresh_counts') {
+                refreshAllNavbarBadges();
             }
         };
 
@@ -280,20 +304,123 @@
             }, 5000);
         }
 
-        function updateNotificationBadge() {
+        function setNotificationBadgeCount(count) {
             const badge = document.getElementById('notification-badge');
             const badgeMobile = document.getElementById('notification-badge-mobile');
-            if (badge) {
-                const currentCount = parseInt(badge.textContent) || 0;
-                badge.textContent = currentCount + 1;
-                badge.classList.remove('hidden');
-            }
-            if (badgeMobile) {
-                const currentCountMobile = parseInt(badgeMobile.textContent) || 0;
-                badgeMobile.textContent = currentCountMobile + 1;
-                badgeMobile.classList.remove('hidden');
+            const badgeMenu = document.getElementById('notification-badge-menu');
+            const normalized = Math.max(0, parseInt(count) || 0);
+
+            const apply = (el) => {
+                if (!el) return;
+                el.textContent = normalized;
+                if (normalized > 0) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            };
+
+            apply(badge);
+            apply(badgeMobile);
+            apply(badgeMenu);
+        }
+
+        function setStoriesBadgeCount(count) {
+            const badge = document.getElementById('stories-badge');
+            const badgeMenu = document.getElementById('stories-badge-menu');
+            const normalized = Math.max(0, parseInt(count) || 0);
+
+            const apply = (el) => {
+                if (!el) return;
+                el.textContent = normalized;
+                if (normalized > 0) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            };
+
+            apply(badge);
+            apply(badgeMenu);
+        }
+
+        function setChatBadgeCount(count) {
+            const badge = document.getElementById('chat-badge');
+            const badgeMenu = document.getElementById('chat-badge-menu');
+            const normalized = Math.max(0, parseInt(count) || 0);
+
+            const apply = (el) => {
+                if (!el) return;
+                el.textContent = normalized;
+                if (normalized > 0) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            };
+
+            apply(badge);
+            apply(badgeMenu);
+        }
+
+        async function refreshNotificationBadge() {
+            try {
+                const res = await fetch('{% url "api_unread_notifications_count" %}', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                setNotificationBadgeCount(data.unread_count);
+            } catch (err) {
+                // ignore
             }
         }
+
+        async function refreshStoriesBadge() {
+            try {
+                const res = await fetch('{% url "api_unread_stories_count" %}', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                setStoriesBadgeCount(data.unread_count);
+            } catch (err) {
+                // ignore
+            }
+        }
+
+        async function refreshChatBadge() {
+            try {
+                const res = await fetch('{% url "api_unread_chat_count" %}', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                setChatBadgeCount(data.unread_count);
+            } catch (err) {
+                // ignore
+            }
+        }
+
+        function refreshAllNavbarBadges() {
+            refreshNotificationBadge();
+            refreshStoriesBadge();
+            refreshChatBadge();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshAllNavbarBadges();
+
+            if (window.location.pathname === '{% url "notifications" %}') {
+                setNotificationBadgeCount(0);
+            }
+            if (window.location.pathname === '{% url "stories_list" %}') {
+                setStoriesBadgeCount(0);
+            }
+            if (window.location.pathname === '{% url "chat_list" %}') {
+                refreshChatBadge();
+            }
+        });
 
         function toggleDropdown() {
             document.getElementById('userDropdown').classList.toggle('hidden');

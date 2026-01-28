@@ -3,9 +3,9 @@
 {% block title %}Achievement - {{ profile_user.username }} - Zone4Love{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-6">
+<div class="max-w-4xl mx-auto px-3 sm:px-4 py-6">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-lg shadow-lg p-6 mb-6 text-white">
+    <div class="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-lg shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 text-white">
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold mb-2">
@@ -46,7 +46,7 @@
     <!-- Achievements Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for item in achievements_data %}
-        <div class="bg-white rounded-lg shadow-md p-6 {% if item.earned %}border-2 border-yellow-400{% else %}opacity-60{% endif %} transition hover:shadow-lg">
+        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 {% if item.earned %}border-2 border-yellow-400{% else %}opacity-60{% endif %} transition hover:shadow-lg">
             <div class="flex items-start space-x-4">
                 <div class="text-5xl {% if not item.earned %}grayscale{% endif %}">
                     {{ item.achievement.icon }}

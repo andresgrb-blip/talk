@@ -21,6 +21,7 @@ def chat_room(request, room_name):
     if request.user not in chat_room.participants.all():
         chat_room.participants.add(request.user)
     
+    Message.objects.filter(room=chat_room).exclude(sender=request.user).filter(is_read=False).update(is_read=True)
     messages = chat_room.messages.all().order_by('created_at')
     
     context = {

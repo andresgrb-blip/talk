@@ -3,8 +3,8 @@
 {% block title %}Cerca - Talkie{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-4">
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+<div class="max-w-2xl mx-auto px-3 sm:px-4">
+    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
         <form action="{% url 'search' %}" method="get">
             <div class="relative">
                 <input type="text" name="q" value="{{ query }}" 

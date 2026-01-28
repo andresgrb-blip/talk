@@ -2,6 +2,9 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
+from .models import Notification
+from django.utils import timezone
+from .models import Message, Story
 
 
 @login_required
@@ -28,3 +31,30 @@ def search_users_api(request):
         })
     
     return JsonResponse({'users': users_data})
+
+
+@login_required
+def unread_notifications_count(request):
+    unread_count = Notification.objects.filter(recipient=request.user, is_read=False).count()
+    return JsonResponse({'unread_count': unread_count})
+
+
+@login_required
+def unread_chat_count(request):
+    unread_count = Message.objects.filter(
+        room__participants=request.user,
+        is_read=False,
+    ).exclude(sender=request.user).count()
+    return JsonResponse({'unread_count': unread_count})
+
+
+@login_required
+def unviewed_stories_count(request):
+    following_ids = request.user.profile.following.values_list('following__user__id', flat=True)
+
+    stories = Story.objects.filter(
+        author__id__in=list(following_ids) + [request.user.id],
+        expires_at__gt=timezone.now(),
+    ).exclude(views__viewer=request.user)
+
+    return JsonResponse({'unread_count': stories.count()})

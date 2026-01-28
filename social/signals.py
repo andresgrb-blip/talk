@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-from .models import Notification, Post, Comment, Follow, Reaction
+from .models import Notification, Post, Comment, Follow, Reaction, Message, Story
 from . import achievement_checker
 
 
@@ -106,3 +106,34 @@ def check_popular_post_achievement(sender, instance, created, **kwargs):
     if created:
         # Controlla se il post è diventato virale
         achievement_checker.check_popular_post_achievement(instance.post)
+
+
+@receiver(post_save, sender=Message)
+def refresh_counters_on_new_message(sender, instance, created, **kwargs):
+    if created:
+        channel_layer = get_channel_layer()
+
+        participants = instance.room.participants.all()
+        for participant in participants:
+            if participant.id == instance.sender.id:
+                continue
+            async_to_sync(channel_layer.group_send)(
+                f'notifications_{participant.id}',
+                {
+                    'type': 'refresh_counts'
+                }
+            )
+
+
+@receiver(post_save, sender=Story)
+def refresh_counters_on_new_story(sender, instance, created, **kwargs):
+    if created:
+        channel_layer = get_channel_layer()
+
+        for follow_relationship in instance.author.profile.followers.all():
+            async_to_sync(channel_layer.group_send)(
+                f'notifications_{follow_relationship.follower.user.id}',
+                {
+                    'type': 'refresh_counts'
+                }
+            )

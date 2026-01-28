@@ -89,6 +89,11 @@ def explore(request):
 
 
 @login_required
+def random_chat(request):
+    return render(request, 'social/random_chat.html')
+
+
+@login_required
 def profile(request, username):
     user = get_object_or_404(User, username=username)
     posts = Post.objects.filter(author=user).select_related('author', 'author__profile').prefetch_related('likes', 'comments')

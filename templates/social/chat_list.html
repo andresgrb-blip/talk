@@ -3,14 +3,14 @@
 {% block title %}Chat - Zone4Love{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4">
+<div class="max-w-4xl mx-auto px-3 sm:px-4">
     <h2 class="text-2xl font-bold text-gray-900 mb-6">
         <i class="fas fa-comments text-pink-600"></i> Messaggi
     </h2>
 
     <div class="bg-white rounded-lg shadow-md">
         {% for room in chat_rooms %}
-        <a href="{% url 'chat_room' room.name %}" class="block p-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition">
+        <a href="{% url 'chat_room' room.name %}" class="block p-3 sm:p-4 border-b border-gray-200 last:border-0 hover:bg-gray-50 transition">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <i class="fas fa-comment-dots text-2xl text-pink-600"></i>

@@ -3,7 +3,7 @@
 {% block title %}Post - Zone4Love{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-4">
+<div class="max-w-2xl mx-auto px-3 sm:px-4">
     <div class="mb-4">
         <a href="javascript:history.back()" class="text-pink-600 hover:text-pink-700">
             <i class="fas fa-arrow-left"></i> Indietro
@@ -37,7 +37,7 @@
                 {% endif %}
             </div>
             
-            <p class="text-gray-800 text-lg mb-4 whitespace-pre-wrap">{{ post.content }}</p>
+            <p class="text-gray-800 text-base sm:text-lg mb-4 whitespace-pre-wrap">{{ post.content }}</p>
             
             {% if post.image %}
             <img src="{{ post.image.url }}" 
@@ -77,7 +77,7 @@
                            required>
                 </div>
                 <button type="submit" 
-                        class="px-4 py-2 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition">
+                        class="px-4 py-2.5 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>

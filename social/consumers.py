@@ -1,4 +1,6 @@
 import json
+import asyncio
+import time
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import User
@@ -53,6 +55,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'type': 'new_comment',
             'comment': event['comment']
+        }))
+
+    async def refresh_counts(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'refresh_counts'
         }))
 
     @database_sync_to_async
@@ -203,3 +210,172 @@ class CallConsumer(AsyncWebsocketConsumer):
             'user_id': event.get('user_id'),
             'username': event.get('username'),
         }))
+
+
+class RandomChatConsumer(AsyncWebsocketConsumer):
+    _lock = asyncio.Lock()
+    _waiting = None  # {'user_id': int, 'username': str, 'channel_name': str}
+
+    async def connect(self):
+        self.user = self.scope["user"]
+
+        if self.user.is_anonymous:
+            await self.close()
+            return
+
+        self.room_group_name = None
+        self.in_queue = False
+
+        await self.accept()
+
+        await self.send(text_data=json.dumps({
+            'type': 'ready'
+        }))
+
+    async def disconnect(self, close_code):
+        await self._leave_queue_if_needed()
+        await self._leave_room(notify_partner=True)
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        message_type = data.get('type')
+
+        if message_type == 'start':
+            await self._enqueue_or_match()
+            return
+
+        if message_type == 'next':
+            await self._leave_room(notify_partner=True)
+            await self._enqueue_or_match()
+            return
+
+        if message_type == 'stop':
+            await self._leave_queue_if_needed()
+            await self._leave_room(notify_partner=True)
+            await self.send(text_data=json.dumps({'type': 'stopped'}))
+            return
+
+        if message_type == 'message':
+            if not self.room_group_name:
+                return
+            message = (data.get('message') or '').strip()
+            if not message:
+                return
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'random_chat_message',
+                    'message': message,
+                    'username': self.user.username,
+                    'user_id': self.user.id,
+                    'timestamp': int(time.time()),
+                }
+            )
+
+    async def random_chat_message(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'message',
+            'message': event.get('message'),
+            'username': event.get('username'),
+            'user_id': event.get('user_id'),
+            'timestamp': event.get('timestamp'),
+        }))
+
+    async def random_partner_left(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'partner_left'
+        }))
+
+    async def _enqueue_or_match(self):
+        if self.room_group_name:
+            return
+
+        async with RandomChatConsumer._lock:
+            waiting = RandomChatConsumer._waiting
+
+            if waiting and waiting.get('user_id') != self.user.id:
+                other = waiting
+                RandomChatConsumer._waiting = None
+
+                room_id = f"random_{min(other['user_id'], self.user.id)}_{max(other['user_id'], self.user.id)}_{int(time.time())}"
+                self.room_group_name = room_id
+                self.in_queue = False
+
+                await self.channel_layer.group_add(room_id, self.channel_name)
+
+                await self.send(text_data=json.dumps({
+                    'type': 'matched',
+                    'room': room_id,
+                    'partner': {
+                        'user_id': other['user_id'],
+                        'username': other['username'],
+                    }
+                }))
+
+                await self.channel_layer.send(
+                    other['channel_name'],
+                    {
+                        'type': 'random_matched_direct',
+                        'room': room_id,
+                        'partner_user_id': self.user.id,
+                        'partner_username': self.user.username,
+                    }
+                )
+                return
+
+            RandomChatConsumer._waiting = {
+                'user_id': self.user.id,
+                'username': self.user.username,
+                'channel_name': self.channel_name,
+            }
+            self.in_queue = True
+
+        await self.send(text_data=json.dumps({
+            'type': 'queued'
+        }))
+
+    async def random_matched_direct(self, event):
+        room = event.get('room')
+        if not room:
+            return
+
+        self.room_group_name = room
+        self.in_queue = False
+        await self.channel_layer.group_add(room, self.channel_name)
+
+        await self.send(text_data=json.dumps({
+            'type': 'matched',
+            'room': room,
+            'partner': {
+                'user_id': event.get('partner_user_id'),
+                'username': event.get('partner_username'),
+            }
+        }))
+
+    async def _leave_queue_if_needed(self):
+        if not self.in_queue:
+            return
+
+        async with RandomChatConsumer._lock:
+            waiting = RandomChatConsumer._waiting
+            if waiting and waiting.get('user_id') == self.user.id:
+                RandomChatConsumer._waiting = None
+        self.in_queue = False
+
+    async def _leave_room(self, notify_partner: bool):
+        if not self.room_group_name:
+            return
+
+        room = self.room_group_name
+        self.room_group_name = None
+
+        if notify_partner:
+            await self.channel_layer.group_send(
+                room,
+                {
+                    'type': 'random_partner_left'
+                }
+            )
+
+        await self.channel_layer.group_discard(room, self.channel_name)

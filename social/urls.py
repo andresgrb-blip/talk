@@ -19,6 +19,7 @@ urlpatterns = [
     path('follow/<str:username>/', views.follow_user, name='follow_user'),
     path('notifications/', views.notifications, name='notifications'),
     path('search/', views.search, name='search'),
+    path('random/', views.random_chat, name='random_chat'),
     
     # Chat
     path('chat/', chat_views.chat_list, name='chat_list'),
@@ -59,4 +60,7 @@ urlpatterns = [
     
     # API endpoints
     path('api/search/users/', api_views.search_users_api, name='api_search_users'),
+    path('api/notifications/unread_count/', api_views.unread_notifications_count, name='api_unread_notifications_count'),
+    path('api/chat/unread_count/', api_views.unread_chat_count, name='api_unread_chat_count'),
+    path('api/stories/unread_count/', api_views.unviewed_stories_count, name='api_unread_stories_count'),
 ]

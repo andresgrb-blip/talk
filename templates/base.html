@@ -1,9 +1,26 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{% block title %}Talkie{% endblock %}</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="{% block meta_description %}Incontra nuove persone attraverso chat random e condividi momenti con la community. Talkie è il social network per incontri autentici.{% endblock %}">
+    <meta name="theme-color" content="#db2777">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Talkie">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'icons/icon-192x192.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'icons/icon-192x192.png' %}">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -200,6 +217,9 @@
                     </a>
                     <a href="{% url 'edit_profile' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-cog"></i> Impostazioni
+                    </a>
+                    <a href="{% url 'privacy_policy' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-shield-alt"></i> Privacy Policy
                     </a>
                     <a href="{% url 'logout' %}" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-sign-out-alt"></i> Logout
@@ -607,6 +627,87 @@
             })
             .catch(error => {
                 console.error('Error:', error);
+            });
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50 border-t border-gray-200 mt-12 py-8 {% if user.is_authenticated %}mb-[calc(4rem+env(safe-area-inset-bottom))] md:mb-0{% endif %}">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <!-- About -->
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Talkie</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Il social network per incontri autentici attraverso chat random e connessioni genuine.
+                    </p>
+                    <div class="flex gap-3">
+                        <a href="https://twitter.com/talkie" target="_blank" class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-pink-600 hover:text-white rounded-full transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://instagram.com/talkie" target="_blank" class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-pink-600 hover:text-white rounded-full transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://github.com/andresgrb-blip/talkie" target="_blank" class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-pink-600 hover:text-white rounded-full transition">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Product -->
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Prodotto</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{% url 'about_us' %}" class="text-gray-600 hover:text-pink-600">Chi Siamo</a></li>
+                        <li><a href="{% url 'blog_list' %}" class="text-gray-600 hover:text-pink-600">Blog</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'random_chat' %}" class="text-gray-600 hover:text-pink-600">Random Chat</a></li>
+                        <li><a href="{% url 'feed' %}" class="text-gray-600 hover:text-pink-600">Feed</a></li>
+                        {% else %}
+                        <li><a href="{% url 'register' %}" class="text-gray-600 hover:text-pink-600">Registrati</a></li>
+                        <li><a href="{% url 'login' %}" class="text-gray-600 hover:text-pink-600">Accedi</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <!-- Legal -->
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Legale</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{% url 'privacy_policy' %}" class="text-gray-600 hover:text-pink-600">Privacy Policy</a></li>
+                        <li><a href="{% url 'privacy_policy' %}#gdpr" class="text-gray-600 hover:text-pink-600">Diritti GDPR</a></li>
+                        <li><a href="mailto:privacy@talkie.ovh" class="text-gray-600 hover:text-pink-600">Richieste Privacy</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Support -->
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Supporto</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="mailto:support@talkie.ovh" class="text-gray-600 hover:text-pink-600">Contattaci</a></li>
+                        <li><a href="{% url 'about_us' %}#faq" class="text-gray-600 hover:text-pink-600">FAQ</a></li>
+                        <li><a href="https://github.com/andresgrb-blip/talkie/issues" target="_blank" class="text-gray-600 hover:text-pink-600">Segnala Bug</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-gray-200 text-center text-sm text-gray-600">
+                <p>© 2025 Talkie. Tutti i diritti riservati. Made with ❤️ for authentic connections.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('SW registered:', registration);
+                    })
+                    .catch((error) => {
+                        console.log('SW registration failed:', error);
+                    });
             });
         }
     </script>

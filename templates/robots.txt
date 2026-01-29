@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /chat/
+Disallow: /call/
+Disallow: /edit-profile/
+
+Sitemap: https://talkie.ovh/sitemap.xml

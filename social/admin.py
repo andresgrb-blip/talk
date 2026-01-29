@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (Profile, Post, Like, Comment, Follow, Notification, ChatRoom, Message,
                      Story, StoryView, Reaction, Hashtag, PostHashtag, Achievement, 
-                     UserAchievement, Group, GroupMembership, GroupPost, UserPreferences)
+                     UserAchievement, Group, GroupMembership, GroupPost, UserPreferences, BlogPost)
 
 
 @admin.register(Profile)
@@ -143,3 +143,25 @@ class UserPreferencesAdmin(admin.ModelAdmin):
     list_display = ['user', 'dark_mode', 'email_notifications', 'push_notifications']
     search_fields = ['user__username']
     list_filter = ['dark_mode']
+
+
+@admin.register(BlogPost)
+class BlogPostAdmin(admin.ModelAdmin):
+    list_display = ['title', 'author', 'published', 'published_at', 'views', 'created_at']
+    search_fields = ['title', 'content', 'excerpt']
+    list_filter = ['published', 'published_at', 'created_at']
+    prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ['views', 'created_at', 'updated_at']
+    
+    fieldsets = (
+        ('Contenuto', {
+            'fields': ('title', 'slug', 'author', 'excerpt', 'content', 'featured_image')
+        }),
+        ('Pubblicazione', {
+            'fields': ('published', 'published_at')
+        }),
+        ('Statistiche', {
+            'fields': ('views', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )

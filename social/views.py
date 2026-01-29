@@ -3,10 +3,13 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
 from django.views.decorators.http import require_http_methods
-from .models import Post, Profile, Like, Comment, Follow, Notification
+from django.conf import settings
+from django.core.paginator import Paginator
+import os
+from .models import Post, Profile, Like, Comment, Follow, Notification, BlogPost
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, PostForm, CommentForm
 from .hashtag_views import process_post_hashtags
 
@@ -91,6 +94,50 @@ def explore(request):
 @login_required
 def random_chat(request):
     return render(request, 'social/random_chat.html')
+
+
+def service_worker(request):
+    sw_path = os.path.join(settings.BASE_DIR, 'static', 'service-worker.js')
+    with open(sw_path, 'r') as f:
+        content = f.read()
+    return HttpResponse(content, content_type='application/javascript')
+
+
+def privacy_policy(request):
+    return render(request, 'social/privacy_policy.html')
+
+
+def about_us(request):
+    return render(request, 'social/about.html')
+
+
+def blog_list(request):
+    posts = BlogPost.objects.filter(published=True)
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'social/blog_list.html', {'posts': page_obj})
+
+
+def blog_detail(request, slug):
+    post = get_object_or_404(BlogPost, slug=slug, published=True)
+    post.views += 1
+    post.save(update_fields=['views'])
+    return render(request, 'social/blog_detail.html', {'post': post})
+
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /admin/",
+        "Disallow: /chat/",
+        "Disallow: /call/",
+        "Disallow: /edit-profile/",
+        "",
+        "Sitemap: https://talkie.ovh/sitemap.xml",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
 @login_required

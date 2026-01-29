@@ -3,6 +3,8 @@ from . import views, chat_views, story_views, reaction_views, hashtag_views, ach
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('service-worker.js', views.service_worker, name='service_worker'),
+    path('robots.txt', views.robots_txt, name='robots_txt'),
     path('feed/', views.feed, name='feed'),
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
@@ -20,6 +22,10 @@ urlpatterns = [
     path('notifications/', views.notifications, name='notifications'),
     path('search/', views.search, name='search'),
     path('random/', views.random_chat, name='random_chat'),
+    path('privacy/', views.privacy_policy, name='privacy_policy'),
+    path('about/', views.about_us, name='about_us'),
+    path('blog/', views.blog_list, name='blog_list'),
+    path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
     
     # Chat
     path('chat/', chat_views.chat_list, name='chat_list'),

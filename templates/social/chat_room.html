@@ -51,8 +51,9 @@
     const currentUserId = parseInt("{{ user.id }}");
     const currentUsername = "{{ user.username }}";
     
+    const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const chatSocket = new WebSocket(
-        'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
+        wsScheme + '://' + window.location.host + '/ws/chat/' + roomName + '/'
     );
 
     const messagesContainer = document.getElementById('chat-messages');

@@ -9,7 +9,7 @@ echo "================================"
 echo ""
 
 # Vai nella directory del progetto
-cd ~/social || { echo "❌ Directory ~/social non trovata. Modifica lo script con il percorso corretto."; exit 1; }
+cd /opt/talkie/app || { echo "❌ Directory /opt/talkie/app non trovata. Modifica lo script con il percorso corretto."; exit 1; }
 
 echo "📂 Directory progetto: $(pwd)"
 echo ""
@@ -29,10 +29,11 @@ python manage.py collectstatic --noinput
 echo "✅ Collectstatic completato"
 echo ""
 
-# 3. Fix permessi directory HOME (importante!)
-echo "🔑 Fix permessi directory home..."
-chmod 755 ~
-echo "✅ Home directory ora accessibile"
+# 3. Fix permessi directory /opt/talkie (importante!)
+echo "🔑 Fix permessi directory /opt/talkie..."
+chmod 755 /opt/talkie
+chmod 755 /opt/talkie/app
+echo "✅ Directory progetto ora accessibile"
 echo ""
 
 # 4. Fix permessi staticfiles

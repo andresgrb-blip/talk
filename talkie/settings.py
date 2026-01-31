@@ -143,6 +143,10 @@ CSRF_TRUSTED_ORIGINS = [
     'https://www.talkie.ovh',
 ]
 
+# CSRF settings for AJAX requests
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read CSRF token
+CSRF_COOKIE_SECURE = True  # Only send cookie over HTTPS
+
 WEBRTC_ICE_SERVERS = json.loads(config(
     'WEBRTC_ICE_SERVERS',
     default='[{"urls":["stun:stun.l.google.com:19302"]}]'

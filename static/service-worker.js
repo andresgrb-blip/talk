@@ -1,10 +1,7 @@
-const CACHE_NAME = 'talkie-v1';
-const RUNTIME_CACHE = 'talkie-runtime';
+const CACHE_NAME = 'talkie-v2';
+const RUNTIME_CACHE = 'talkie-runtime-v2';
 
 const PRECACHE_URLS = [
-  '/',
-  '/feed/',
-  '/random/',
   '/static/manifest.json',
 ];
 
@@ -46,11 +43,15 @@ self.addEventListener('fetch', (event) => {
         }
 
         return caches.open(RUNTIME_CACHE).then((cache) => {
-          return fetch(event.request).then((response) => {
-            if (response.status === 200) {
+          return fetch(event.request, { redirect: 'follow' }).then((response) => {
+            // Non cachare redirect (301, 302) o errori
+            if (response.status === 200 && response.type === 'basic') {
               cache.put(event.request, response.clone());
             }
             return response;
+          }).catch((error) => {
+            // Se fetch fallisce, ritorna network error invece di cache
+            return fetch(event.request);
           });
         });
       })

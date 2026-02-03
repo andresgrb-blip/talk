@@ -226,3 +226,4 @@ Questo progetto è open source.
 ## 👨‍💻 Autore
 
 Zone4Love Social Network
+# talk

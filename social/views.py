@@ -60,10 +60,8 @@ def user_logout(request):
 
 @login_required
 def feed(request):
-    following_profiles = request.user.profile.following.values_list('following', flat=True)
-    posts = Post.objects.filter(
-        Q(author__profile__in=following_profiles) | Q(author=request.user)
-    ).select_related('author', 'author__profile').prefetch_related('likes', 'comments')
+    # Show all posts ordered by creation date (most recent first)
+    posts = Post.objects.all().select_related('author', 'author__profile').prefetch_related('likes', 'comments').order_by('-created_at')
     
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)

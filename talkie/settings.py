@@ -47,6 +47,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Prevent APPEND_SLASH from causing CSRF issues on POST requests
+APPEND_SLASH = False
+
 ROOT_URLCONF = 'talkie.urls'
 
 TEMPLATES = [

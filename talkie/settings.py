@@ -151,6 +151,7 @@ CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read CSRF token
 CSRF_COOKIE_SECURE = True  # Only send cookie over HTTPS
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = False
+CSRF_COOKIE_DOMAIN = None  # Let Django handle domain automatically
 
 WEBRTC_ICE_SERVERS = json.loads(config(
     'WEBRTC_ICE_SERVERS',
